@@ -2,14 +2,14 @@
 // Use of this source code is governed by a MIT license
 // that can be found in the LICENSE.txt file.
 
-// toLaser is a gcode post processor for jscut that prepares input
+// to-laser is a gcode post processor for jscut that prepares input
 // for a Grbl controlled laser cutter.
 //
 // Usage
 //
 // Just redirect gcode via pipe:
 //
-// 	cat gcode.nc | toLaser > laser.gcode
+// 	cat gcode.nc | tl > laser.gcode
 package main
 
 // TODO implements these as parameters
@@ -25,6 +25,9 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
+
+	"github.com/eraclitux/cfgp"
 )
 
 const (
@@ -35,16 +38,37 @@ const (
 	retractComment = "; Retract"
 )
 
+type Conf struct {
+	Power int `cfgp:"power,% of laser power [0-100],"`
+}
+
+// parsePower transform laser power from [0-100]% range
+// to S[0-100] gcode parameter.
+func parsePower(p int) (string, error) {
+	if p < 0 || p > 100 {
+		return "", fmt.Errorf("invalid power value: %d", p)
+	}
+	i := strconv.Itoa(p)
+	return "S" + i, nil
+}
+
 func main() {
+	c := Conf{}
+	err := cfgp.Parse("", &c)
+	if err != nil {
+		log.Fatal("Unable to parse configuration", err)
+	}
 	toPlunge := false
 	toRetract := false
-	// FIXME parametrize this
-	laserPower := "S127"
 	s := bufio.NewScanner(os.Stdin)
 	for s.Scan() {
 		line := s.Text()
 		if toPlunge {
-			fmt.Println(laserOnGcode, laserPower)
+			p, err := parsePower(c.Power)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			fmt.Println(laserOnGcode, p)
 			fmt.Println(delayGcode)
 			toPlunge = false
 		}

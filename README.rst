@@ -1,12 +1,12 @@
 =======
-toLaser
+to-laser
 =======
 
-toLaser is a command line gcode post processor for ``jscut`` that prapares gcode for a ``Grbl`` controlled laser cutter.
+``tl`` is a command line gcode post processor for `jscut <https://github.com/tbfleming/jscut>_` that prapares gcode for a ``Grbl`` controlled laser cutter.
 
 Examples
 ========
 
 Just redirect gcode via pipe::
 
-        cat gcode.nc | toLaser > laser.gcode
+        cat gcode.nc | tl > laser.gcode
