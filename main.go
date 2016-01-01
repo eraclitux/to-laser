@@ -54,7 +54,7 @@ func parsePower(p int) (string, error) {
 
 func main() {
 	c := Conf{}
-	err := cfgp.Parse("", &c)
+	err := cfgp.Parse(&c)
 	if err != nil {
 		log.Fatal("Unable to parse configuration", err)
 	}
