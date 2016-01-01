@@ -30,6 +30,9 @@ import (
 	"github.com/eraclitux/cfgp"
 )
 
+var Version = "unknown-build"
+var BuildTime = "unknown-time"
+
 const (
 	delayGcode     = "G4 P0.5"
 	laserOnGcode   = "M3"
@@ -39,7 +42,8 @@ const (
 )
 
 type Conf struct {
-	Power int `cfgp:"power,% of laser power [0-100],"`
+	Power   int  `cfgp:"power,% of laser power [0-100],"`
+	Version bool `cfgp:"v,show version and exit,"`
 }
 
 // parsePower transform laser power from [0-100]% range
@@ -57,6 +61,10 @@ func main() {
 	err := cfgp.Parse(&c)
 	if err != nil {
 		log.Fatal("Unable to parse configuration", err)
+	}
+	if c.Version {
+		fmt.Println("to-laser - jscut post processor for Grbl laser cutters", Version, BuildTime)
+		return
 	}
 	toPlunge := false
 	toRetract := false
